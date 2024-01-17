@@ -11,7 +11,7 @@ func main() {
 
 	newApp := app.NewApp(db)
 
-	router.SetupRutes(newApp.App, db, newApp.Store)
+	router.SetupRutes(newApp.App, db, newApp.Store, newApp.Manager)
 	newApp.Start()
 
 }

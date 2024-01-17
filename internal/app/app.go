@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	manage "github.com/b3nhard/chat-x/internal/manager"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/template/html/v2"
 
@@ -13,9 +14,10 @@ import (
 )
 
 type App struct {
-	App   *fiber.App
-	DB    *sql.DB
-	Store *session.Store
+	App     *fiber.App
+	DB      *sql.DB
+	Store   *session.Store
+	Manager *manage.Manager
 }
 
 func NewApp(_db *sql.DB) *App {
@@ -38,6 +40,9 @@ func NewApp(_db *sql.DB) *App {
 		App:   app,
 		DB:    _db,
 		Store: store,
+		Manager: &manage.Manager{
+			Connections: make(map[string]*websocket.Conn),
+		},
 	}
 }
 

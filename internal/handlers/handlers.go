@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	manage "github.com/b3nhard/chat-x/internal/manager"
 	"github.com/b3nhard/chat-x/internal/models"
 	"github.com/b3nhard/chat-x/internal/utils"
 	"github.com/gofiber/contrib/websocket"
@@ -98,7 +99,7 @@ func Index(store *session.Store) fiber.Handler {
 	}
 }
 
-func WebsocketHandler(db *sql.DB, store *session.Store) fiber.Handler {
+func WebsocketHandler(db *sql.DB, store *session.Store, m *manage.Manager) fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		c.Locals("user")
 		var (
