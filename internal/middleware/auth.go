@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
@@ -23,7 +22,6 @@ func Auth(store *session.Store) fiber.Handler {
 				return c.Redirect(fmt.Sprintf("/login?next=%s", next))
 			}
 			c.Locals("user", user.(string))
-			log.Println("Middleware User: ", user)
 		} else {
 			return c.Redirect(fmt.Sprintf("/login?next=%s", next))
 		}

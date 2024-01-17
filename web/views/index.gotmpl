@@ -1,5 +1,5 @@
 <div x-data="{open:false}" class="flex">
-    <aside @click.outside="open=!open" :class="{'-translate-x-64':!open}"
+    <aside x-transition.duration.100ms @click.window.outside="open= false" :class="{'-translate-x-64':!open}"
         class="absolute md:relative h-screen w-64  bg-green-400  ">
         <p class="p-3">Users</p>
         <div id="user-list">
@@ -7,16 +7,16 @@
         </div>
     </aside>
     <div hx-ext="ws" ws-connect="/ws" class="h-screen flex flex-col  w-[500px] ">
-        <nav class="p-4 flex space-x-4 bg-green-600 text-white font-bold uppercase">
-            <button role="button" class="size-10" @click="open=true" >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
+        <nav class="p-4  bg-green-600 text-white font-bold uppercase">
+            <div class="flex items-center">
+                <svg @click.window="open=true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" class="w-8 h-8 bg-red">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
-            </button>
+                <p class="ml-4 ">{{.user}}</p>
+            </div>
 
-            <p class="text-xl font-bold">{{.user}}</p>
         </nav>
         <div id="messages" class="flex-1 overflow-y-auto p-4  bg-white ">
             <!-- Chat messages go here -->

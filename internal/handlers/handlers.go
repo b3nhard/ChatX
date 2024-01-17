@@ -94,19 +94,21 @@ func Signup(store *session.Store, db *sql.DB) fiber.Handler {
 func Index(store *session.Store) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := c.Locals("user")
-		log.Println("USER: ", user)
 		return c.Render("index", fiber.Map{"user": user, "Title": "ChatX | Home"})
 	}
 }
 
 func WebsocketHandler(db *sql.DB, store *session.Store, m *manage.Manager) fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
-		c.Locals("user")
+		user := c.Locals("user")
+		log.Println(user)
 		var (
 			mt  int
 			msg []byte
 			err error
 		)
+
+		// m.Add(c)
 
 		for {
 			if mt, msg, err = c.ReadMessage(); err != nil {
