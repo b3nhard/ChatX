@@ -98,9 +98,22 @@ func Index(store *session.Store) fiber.Handler {
 	}
 }
 
-func WebsocketHandler(db *sql.DB, store *session.Store, m *manage.Manager) fiber.Handler {
+func Logout(store *session.Store) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		user := c.Locals("user").(string)
+		s, err := store.Get(c)
+		if err != nil {
+			return c.Redirect("/login")
+		}
+		s.Delete(user)
+		s.Destroy()
+		return c.Redirect("/login")
+	}
+}
+
+func WebsocketHandler(db *sql.DB, store *session.Store, mg *manage.Manager) fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
-		user := c.Locals("user")
+		user := c.Locals("user").(string)
 		log.Println(user)
 		var (
 			mt  int
@@ -108,7 +121,7 @@ func WebsocketHandler(db *sql.DB, store *session.Store, m *manage.Manager) fiber
 			err error
 		)
 
-		// m.Add(c)
+		mg.Add(user, c)
 
 		for {
 			if mt, msg, err = c.ReadMessage(); err != nil {
@@ -130,8 +143,12 @@ func WebsocketHandler(db *sql.DB, store *session.Store, m *manage.Manager) fiber
 				<small class="text-sm text-green-500">%s</small>
 				</div>
 				
-			</div>
-			</div>`, m.Message, c.Locals("user").(string))
+				</div>
+				</div>
+				<div hx-swap-oob="beforeend:#users" >
+				<p>holla</p>
+				</div>
+			`, m.Message, c.Locals("user").(string))
 
 			if err = c.WriteMessage(mt, []byte(text)); err != nil {
 				log.Println("write:", err)

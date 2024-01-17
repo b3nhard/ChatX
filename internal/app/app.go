@@ -5,6 +5,7 @@ import (
 	"time"
 
 	manage "github.com/b3nhard/chat-x/internal/manager"
+	"github.com/b3nhard/chat-x/internal/middleware"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/template/html/v2"
 
@@ -37,23 +38,24 @@ func NewApp(_db *sql.DB) *App {
 	})
 
 	return &App{
-		App:   app,
-		DB:    _db,
-		Store: store,
-		Manager: &manage.Manager{
-			Connections: make(map[string]*websocket.Conn),
-		},
+		App:     app,
+		DB:      _db,
+		Store:   store,
+		Manager: manage.NewManager(),
 	}
 }
 
 func (a *App) Start() {
 
 	a.App.Static("/static", "web/static", fiber.Static{Compress: true})
-	a.App.Use("/ws", func(c *fiber.Ctx) error {
+	a.App.Use("/ws", middleware.Auth(a.Store), func(c *fiber.Ctx) error {
 		// IsWebSocketUpgrade returns true if the client
 		// requested upgrade to the WebSocket protocol.
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)
+			user := c.Locals("user").(string)
+			a.Manager.Add(user, nil)
+
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
